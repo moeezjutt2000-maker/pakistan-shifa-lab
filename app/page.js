@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 
 export default function ShifaAllInOnePortal() {
-  // Form State Inputs
   const [formData, setFormData] = useState({
     patientId: '',
     patientName: '',
@@ -17,11 +16,9 @@ export default function ShifaAllInOnePortal() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
-  
-  // Built-in Database Simulation State (Saves automatically to Browser Storage)
   const [databaseRecords, setDatabaseRecords] = useState([]);
 
-  // Load records on start
+  // Built-in Database: Automatically loads records from browser storage on startup
   useEffect(() => {
     const savedData = localStorage.getItem('shifa_db');
     if (savedData) {
@@ -36,11 +33,9 @@ export default function ShifaAllInOnePortal() {
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      // Converts file to a web-viewable URL string natively
       setFile({
         name: selectedFile.name,
-        size: `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`,
-        previewUrl: URL.createObjectURL(selectedFile)
+        size: `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`
       });
     }
   };
@@ -50,7 +45,7 @@ export default function ShifaAllInOnePortal() {
     setLoading(true);
     setStatus({ type: 'info', message: 'Processing diagnostic metrics...' });
 
-    // Simulate Server API Latency network requests
+    // Simulate short server process delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     try {
@@ -61,14 +56,12 @@ export default function ShifaAllInOnePortal() {
         dateLogged: new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })
       };
 
-      // Built-in Database Sync Logic
+      // Appends new record directly to storage engine
       const updatedDb = [newRecord, ...databaseRecords];
       setDatabaseRecords(updatedDb);
       localStorage.setItem('shifa_db', JSON.stringify(updatedDb));
 
       setStatus({ type: 'success', message: '✅ Entry successfully saved to Shifa Records!' });
-      
-      // Reset input layout fields
       setFormData({ patientId: '', patientName: '', testName: '', testValue: '', testUnit: 'mg/dL', referenceRange: '', comments: '' });
       setFile(null);
       e.target.reset();
@@ -132,7 +125,7 @@ export default function ShifaAllInOnePortal() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clinical Remarks / Remarks</label>
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Clinical Remarks / Notes</label>
             <textarea name="comments" value={formData.comments} onChange={handleChange} rows="2" className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:outline-none" placeholder="Patient history or pathology details..."></textarea>
           </div>
 
@@ -163,7 +156,7 @@ export default function ShifaAllInOnePortal() {
         {databaseRecords.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
             <p className="text-slate-400 font-medium text-sm">No lab entries found in the system memory.</p>
-            <p className="text-slate-400 text-xs mt-1">Fill out the left-hand form parameters to automatically populate this live database view.</p>
+            <p className="text-slate-400 text-xs mt-1">Fill out the left-hand form parameters to populate this live database view.</p>
           </div>
         ) : (
           <div className="space-y-3 overflow-y-auto max-h-[650px] pr-2">
@@ -179,21 +172,13 @@ export default function ShifaAllInOnePortal() {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-x-6 gap-y-1 mt-3 text-xs">
-                    <p className="text-slate-600">
-                      <strong className="text-slate-500">Test:</strong> {record.testName}
-                    </p>
-                    <p className="text-slate-600">
-                      <strong className="text-slate-500">Normal Range:</strong> {record.referenceRange}
-                    </p>
+                    <p className="text-slate-600"><strong className="text-slate-500">Test:</strong> {record.testName}</p>
+                    <p className="text-slate-600"><strong className="text-slate-500">Normal Range:</strong> {record.referenceRange}</p>
                     {record.attachedFile && (
-                      <p className="text-emerald-700 col-span-2 font-medium mt-1">
-                        Apt Attached: {record.attachedFile.name}
-                      </p>
+                      <p className="text-emerald-700 col-span-2 font-medium mt-1">📎 Attached: {record.attachedFile.name}</p>
                     )}
                     {record.comments && (
-                      <p className="text-slate-500 italic col-span-2 mt-1 bg-white p-2 rounded border border-slate-100">
-                        “{record.comments}”
-                      </p>
+                      <p className="text-slate-500 italic col-span-2 mt-1 bg-white p-2 rounded border border-slate-100">“{record.comments}”</p>
                     )}
                   </div>
                 </div>
